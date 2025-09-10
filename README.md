@@ -128,7 +128,8 @@ truth_weaver_pipeline/
 Use the provided bash script:
 
 ```bash
-./run_pipeline.sh
+chmod +x pipeline.sh
+./pipeline.sh
 ```
 
 It will:
