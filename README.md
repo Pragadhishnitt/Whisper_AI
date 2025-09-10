@@ -12,12 +12,12 @@ pip install -r requirements.txt
 export GOOGLE_API_KEY="YOUR_KEY" # Windows PS: $env:GOOGLE_API_KEY="YOUR_KEY"
 ```
 
-Put your five files in `inputs/1.mp3 ... 5.mp3` (or edit `config.py`).
+Put your five files in `audio_inputs/1.mp3 ... 5.mp3` (or edit `config.py`).
 
 ## Run
 ```bash
-python stage1_transcribe_annotate.py
-python stage2_truth_extractor.py
+python stage_1.py
+python stage_2.py
 ```
 
 Outputs land in `outputs/`.
@@ -133,8 +133,8 @@ Use the provided bash script:
 
 It will:
 
-1. Run **Stage 1** (`stage1_transcribe_annotate.py`) → generate transcripts & annotations.
-2. Run **Stage 2** (`stage2_truth_extractor.py`) → produce `truth.json`.
+1. Run **Stage 1** (`stage_1.py`) → generate transcripts & annotations.
+2. Run **Stage 2** (`stage_2.py`) → produce `truth.json`.
 
 ---
 
@@ -189,6 +189,7 @@ Check `config.py` to adjust:
 ## 🔮 Future Plans
 
 - Option to replace rule-based annotation with **LLM-based tagger**.  
+- Also looking out for Audio Language Models to replace OpenAI's whisper model
 - Batch pipeline runner with retries and JSON repair.  
 - Convert into an **agentic AI system** (monitoring inputs folder, auto-execution, feedback loop).  
 
