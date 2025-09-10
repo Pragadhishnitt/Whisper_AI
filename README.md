@@ -57,9 +57,9 @@ truth_weaver_pipeline/
 │
 ├── config.py                # Configuration (models, thresholds, file paths)
 ├── utils_audio.py           # Emotion classifier + feature extraction
-├── stage1_transcribe_annotate.py
-├── stage2_truth_extractor.py
-├── run_pipeline.sh          # Bash runner (Stage 1 → Stage 2)
+├── stage_1.py
+├── stage_2.py
+├── pipeline.sh          # Bash runner (Stage 1 → Stage 2)
 ├── requirements.txt
 └── README.md
 ```
@@ -70,7 +70,7 @@ truth_weaver_pipeline/
 
 1. **Clone / open this repo**
    ```bash
-   cd truth_weaver_pipeline
+   cd Whisper_AI
    ```
 
 2. **Create virtual environment**
@@ -100,6 +100,7 @@ truth_weaver_pipeline/
      ```
 
 5. **Configure Gemini API Key**
+  *Can set it up in a .env file as well*
    ```bash
    export GOOGLE_API_KEY="YOUR_KEY"    # Linux/Mac
    $env:GOOGLE_API_KEY="YOUR_KEY"      # Windows PowerShell
@@ -111,11 +112,11 @@ truth_weaver_pipeline/
 
 - Place your 5 audio files in the `inputs/` folder:
   ```
-  inputs/1.mp3
-  inputs/2.mp3
-  inputs/3.mp3
-  inputs/4.mp3
-  inputs/5.mp3
+  audio_inputs/1.mp3
+  audio_inputs/2.mp3
+  audio_inputs/3.mp3
+  audio_inputs/4.mp3
+  audio_inputs/5.mp3
   ```
 
 - By default, **Session N = Audio File N**.
