@@ -105,7 +105,11 @@ truth_weaver_pipeline/
    export GOOGLE_API_KEY="YOUR_KEY"    # Linux/Mac
    $env:GOOGLE_API_KEY="YOUR_KEY"      # Windows PowerShell
    ```
-
+**Setting it as a .env file (method followed in this code)**
+   ```bash
+      python3 create_env.py # Linux/Mac
+      python create_env.py # Windows
+   ```
 ---
 
 ## 🎙️ Inputs
@@ -128,7 +132,7 @@ truth_weaver_pipeline/
 Use the provided bash script:
 
 ```bash
-./run_pipeline.sh
+./pipeline.sh
 ```
 
 It will:
