@@ -48,7 +48,13 @@ def build():
 
         clean_session_lines: List[str] = []
         annotated_session_lines: List[str] = []
-
+        rms_mean = 0.0
+        for seg in segments:
+            start = int(seg["start"] * sr); end = int(seg["end"] * sr)
+            chunk = audio[start:end]
+            rms, pitch = analyze_features(chunk, sr)
+            rms_mean += rms
+        rms_mean /= len(segments)
         for seg in segments:
             start = int(seg["start"] * sr); end = int(seg["end"] * sr)
             chunk = audio[start:end]
@@ -56,13 +62,13 @@ def build():
             emotion = ser.predict_label(chunk, sr)
 
             style = ""
-            if emotion == "angry" or rms > RMS_SHOUT:
+            if emotion == "angry" or rms > RMS_SHOUT*rms_mean:
                 style = "[shouting]"
-            elif emotion in ["sad", "fearful"] and rms < RMS_WHISPER:
+            elif emotion in ["sad", "fearful"] and rms < RMS_WHISPER*rms_mean:
                 style = "[whispered]"
             elif emotion == "sad":
                 style = "[sobbing]"
-            elif rms < RMS_STATIC:
+            elif rms < RMS_STATIC*rms_mean:
                 style = "[static interference]"
 
             clean_session_lines.append(seg["text"].strip())

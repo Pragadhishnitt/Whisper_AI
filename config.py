@@ -1,5 +1,4 @@
 # config.py
-
 WHISPER_BACKEND = "openai-whisper"   # or "faster-whisper"
 WHISPER_MODEL = "turbo"              # try "large-v3" for best accuracy (needs more VRAM/CPU)
 
@@ -14,7 +13,9 @@ AUDIO_FILES = [
 OUTPUT_DIR = "outputs"
 SER_MODEL_ID = "superb/hubert-large-superb-er"
 
+
 # Heuristic thresholds
-RMS_SHOUT = 0.020
-RMS_WHISPER = 0.015
-RMS_STATIC = 0.005
+RMS_WHISPER = 0.5 
+RMS_STATIC  = 0.2 
+RMS_SHOUT   = 1.5 
+
