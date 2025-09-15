@@ -144,11 +144,11 @@ Select your operating system or preferred environment:
 
 **⚠️ Important**: Enable GPU runtime in Colab for optimal performance.
 
-<<<<<<< HEAD
+
 ```bash
 chmod +x pipeline.sh # inculde this line for Linux/Mac
 ./pipeline.sh
-=======
+
 #### Setup and Run
 
 ```python
@@ -184,8 +184,7 @@ os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
 from google.colab import files
 files.download('final_outputs/truth.json')
 files.download('final_outputs/transcript.txt')
->>>>>>> 16f7d6c (Updated Readme)
-```
+
 
 ---
 
