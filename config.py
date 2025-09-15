@@ -28,4 +28,5 @@ RMS_WHISPER = 0.5
 RMS_STATIC = 0.2
 RMS_SHOUT = 1.5
 
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(TRUTH_JSON_OUTPUT, exist_ok=True)
