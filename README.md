@@ -108,6 +108,7 @@ truth_weaver_pipeline/
 Use the provided bash script:
 
 ```bash
+chmod +x pipeline.sh # inculde this line for Linux/Mac
 ./pipeline.sh
 ```
 
