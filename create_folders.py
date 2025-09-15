@@ -3,7 +3,7 @@ import shutil
 
 # --- Configuration ---
 OUTPUTS_DIR = "outputs"   # Folder with your txt files
-DEST_DIR = "Whisper_AI"  # Where grouped dirs will be created
+DEST_DIR = "."  # Where grouped dirs will be created
 # -------------------
 
 # Check if the source directory exists before starting
