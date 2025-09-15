@@ -6,13 +6,13 @@ from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR,TEMP_DIRECTORIES,TRUTH_JSON_OUTPUT,FINAL_OUTPUT_DIR
 from dotenv import load_dotenv
 
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
 
-import re, json
+import re
 
 def extract_json(text: str) -> dict:
     match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -52,46 +52,67 @@ def load_sessions() -> Dict[str, List[Dict[str, Any]]]:
     with open(sessions_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def load_clean_sessions_text() -> Dict[str, str]:
+def load_clean_sessions_text(TEMP_DIR:str) -> Dict[str, str]:
     sessions_text = {}
-    for i in range(1, 6):
-        p = os.path.join(OUTPUT_DIR, f"session_{i}.txt")
-        if os.path.exists(p):
-            with open(p, "r", encoding="utf-8") as f:
-                _ = f.readline()  # Skip "Session i" header
-                sessions_text[str(i)] = f.read().strip()
-        else:
-            print(f"Warning: session_{i}.txt not found at {p}")
-            sessions_text[str(i)] = ""
+    for fname in os.listdir(TEMP_DIR):
+        if fname.endswith(".txt") and "annotated" not in fname:
+            path = os.path.join(TEMP_DIR, fname)
+            with open(path, "r", encoding="utf-8") as f:
+                header = f.readline()  # skip the label line
+                text = f.read().strip()
+                session_id = os.path.splitext(fname)[0]  # e.g. "atlas_2024_1"
+                sessions_text[session_id] = text
     return sessions_text
 
+def infer_shadow_id(clean_sessions: Dict[str, str]) -> str:
+    """Infer shadow_id from filenames (common prefix before _number)."""
+    if not clean_sessions:
+        return "unknown_shadow"
+    first_key = next(iter(clean_sessions.keys()))
+    # e.g. "atlas_2024_1" -> "atlas_2024"
+    parts = first_key.split("_")
+    if parts[-1].isdigit():
+        return "_".join(parts[:-1])
+    return first_key
+
 # -------- LLM Setup --------
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", google_api_key=api_key)
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", google_api_key=api_key, temperature=0.0, top_k=1)
 prompt = ChatPromptTemplate.from_messages([
     ("system", """You are an AI Truth Extractor for technical interviews.
 You will receive 5 sessions of transcripts (clean text) and segment-level annotations (emotion + RMS).
 Your goals:
-1) Detect contradictions across sessions.
+1) Detect ACTUAL contradictions across sessions - only flag as deception if there are clear, objective contradictions.
 2) Infer the most plausible truth (later sessions can be more truthful).
-3) Output STRICT JSON only with this schema:
-
+3) Map frameworks/libraries to their parent languages in format: "Language (Framework)" e.g., "Python (Django)", "Java (SpringBoot)", "JavaScript (React)".
+4) Output STRICT JSON only with this schema:
 {{
-  "shadow_id": "string",
-  "revealed_truth": {{
-    "programming_experience": "string",
-    "programming_language": "string",
-    "skill_mastery": "string",
-    "leadership_claims": "string",
-    "team_experience": "string",
-    "skills and other keywords": ["list"]
-  }},
-  "deception_patterns": [{{
-    "lie_type": "string",
-    "contradictory_claims": ["list of claims"]
-  }}]
+ "shadow_id": "string",
+ "revealed_truth": {{
+ "programming_experience": "string",
+ "programming_language": "string", 
+ "skill_mastery": "string",
+ "leadership_claims": "string",
+ "team_experience": "string",
+ "skills and other keywords": ["list"]
+}},
+ "deception_patterns": [{{
+ "lie_type": "string",
+ "contradictory_claims": ["list of claims"]
+}}]
 }}
 
+
 NO extra text. JSON only.
+CRITICAL RULES:
+- Only add deception_patterns if there are CLEAR, OBJECTIVE contradictions between sessions
+- If no contradictions exist, return empty array: "deception_patterns": []
+- Do NOT infer lies from uncertainty, clarification, or natural conversation flow
+- Do NOT flag as deception: vague statements, estimates, "around X years", refinements of previous answers
+- ONLY flag as deception: direct contradictions like "6 years" vs "2 years" with no reasonable explanation
+- For programming languages: Always map frameworks to parent language format: "Language (Framework)"
+  - Examples: Django → "Python (Django)", React → "JavaScript (React)", SpringBoot → "Java (SpringBoot)"
+  - If only parent language mentioned, use just the language: "Python", "Java", "JavaScript"
+- Focus on objective facts, not interpretations
 
 ### Example Input
 The Five Sessions (audio quality varies):
@@ -118,6 +139,35 @@ The Five Sessions (audio quality varies):
       "contradictory_claims": ["6 years", "3 years"]
     }}
   ]
+}}
+
+### Example Input 2 (Rhea case: consistent truth)
+Sessions consistently describe distributed systems, Java services, Kafka outages, Redis, microservices, mentoring.
+
+### Example Output 2
+{{
+  "shadow_id": "rhea_2024",
+  "revealed_truth": {{
+    "programming_experience": "6+ years",
+    "programming_language": "java (spring)",
+    "skill_mastery": "expert in distributed systems and resilience",
+    "leadership_claims": "experienced tech lead with a focus on mentorship",
+    "team_experience": "extensive, including leading technical initiatives and mentoring junior engineers",
+    "skills and other keywords": [
+      "distributed systems",
+      "kafka",
+      "redis",
+      "microservices",
+      "idempotency",
+      "fault tolerance",
+      "service discovery",
+      "cloud migration",
+      "api design",
+      "system architecture",
+      "mentorship"
+    ]
+  }},
+  "deception_patterns": []
 }}
 """),
     ("human", """Shadow ID: {shadow_id}
@@ -208,54 +258,46 @@ graph.set_entry_point("llm")
 graph.add_edge("llm", "validate")
 truth_flow = graph.compile()
 
-def check_required_files():
-    """Check if all required input files exist"""
-    required_files = [
-        "sessions.json",
-        "session_1.txt",
-        "session_2.txt", 
-        "session_3.txt",
-        "session_4.txt",
-        "session_5.txt"
-    ]
-    
-    missing_files = []
-    for file in required_files:
-        file_path = os.path.join(OUTPUT_DIR, file)
-        if not os.path.exists(file_path):
-            missing_files.append(file)
-    
-    if missing_files:
+def check_required_files(shadow_id: str, clean_sessions: Dict[str, str]):
+    missing = []
+    for i in range(1, 6):
+        key = f"{shadow_id}_{i}"
+        if key not in clean_sessions:
+            missing.append(key + ".txt")
+    if missing:
         print("Missing required files:")
-        for file in missing_files:
-            print(f"  - {file}")
+        for m in missing:
+            print(f"  - {m}")
         return False
-    
     print("All required files found!")
     return True
 
-def main():
+def main(TEMP_DIR:str):
     print(f"Output directory: {OUTPUT_DIR}")
     
     # Check if required files exist
-    if not check_required_files():
-        print("\nPlease ensure all required files are present before running stage 2.")
+    sessions_path = os.path.join(OUTPUT_DIR, "sessions.json")
+    if not os.path.exists(sessions_path):
+        print(f"Missing sessions.json at {sessions_path}")
         return
     
     try:
         # Load data
         annotated = load_sessions()
-        clean = load_clean_sessions_text()
-        
+        clean = load_clean_sessions_text(TEMP_DIR)
+
+        # Get shadow_id from filenames
+        shadow_id = infer_shadow_id(clean)
+
         # Build initial state
         annotated_str = json.dumps(annotated, ensure_ascii=False, indent=2)
         initial_state = TruthExtractorState(
-            shadow_id="shadow_candidate_1",
-            s1=clean.get("1", ""),
-            s2=clean.get("2", ""),
-            s3=clean.get("3", ""),
-            s4=clean.get("4", ""),
-            s5=clean.get("5", ""),
+            shadow_id=shadow_id,
+            s1=clean.get(f"{shadow_id}_1", ""),
+            s2=clean.get(f"{shadow_id}_2", ""),
+            s3=clean.get(f"{shadow_id}_3", ""),
+            s4=clean.get(f"{shadow_id}_4", ""),
+            s5=clean.get(f"{shadow_id}_5", ""),
             annotated_json=annotated_str
         )
         
@@ -267,18 +309,40 @@ def main():
         final_json = result["json"]
 
         print(f'\n\nResult\n{result}\n\n')
-        out_path = os.path.join(OUTPUT_DIR, "truth.json")
+
+        temp_name = os.path.basename(TEMP_DIR)
+
+        out_path = os.path.join(TRUTH_JSON_OUTPUT, f"{temp_name}_truth.json")
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(final_json)
         
         print(f"\n[Stage2] Successfully wrote: {out_path}")
         print("\nGenerated truth.json:")
         print(final_json)
-        
+
+        return json.loads(final_json)
+        print(f"\n[Stage2] Successfully wrote: {out_path}")
+
     except Exception as e:
         print(f"\nError during execution: {e}")
         import traceback
         traceback.print_exc()
+        return None
 
 if __name__ == "__main__":
-    main()
+    combined_results = []
+
+    for DIR in TEMP_DIRECTORIES:
+        result = main(DIR)
+        if result:
+            combined_results.append(result)
+
+    combined_path = os.path.join(FINAL_OUTPUT_DIR, "all_truths.json")
+    with open(combined_path, "w", encoding="utf-8") as f:
+        json.dump(combined_results, f, ensure_ascii=False, indent=2)
+
+    print(f"\n[Stage2] Combined results written to: {combined_path}")
+
+
+    print("\nAll done!\n")
+    print("Check the 'final_outputs' directory for results.")

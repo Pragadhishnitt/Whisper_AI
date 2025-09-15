@@ -1,12 +1,13 @@
 #!/bin/bash
 set -e  
 
-echo "[Pipeline] Stage 1: Transcribing & annotating..."
-python stage_1.py
+python3 create_env.py
 
-echo "[Pipeline] Stage 1 complete. Outputs written to outputs/"
+echo "[Pipeline] Stage 1: Transcribing & annotating..."
+python3 stage_1.py
+
+python3 merge_sessions.py
+python3 create_folders.py
 
 echo "[Pipeline] Stage 2: Truth extraction with Gemini..."
-python stage_2.py
-
-echo "[Pipeline] Stage 2 complete. Final JSON at outputs/truth.json"
+python3 stage_2.py

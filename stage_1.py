@@ -39,15 +39,16 @@ def build():
     ser = EmotionClassifier(SER_MODEL_ID)
     all_segments = []
 
+    whisper_model = load_whisper_model()
     for idx, audio_path in enumerate(AUDIO_FILES, start=1):
         print(f"[Stage1] Processing Session {idx}: {audio_path}")
-        whisper_model = load_whisper_model()
         result = transcribe(whisper_model, audio_path)
         segments = result["segments"]
         audio, sr = librosa.load(audio_path, sr=16000)
 
         clean_session_lines: List[str] = []
         annotated_session_lines: List[str] = []
+
         rms_mean = 0.0
         for seg in segments:
             start = int(seg["start"] * sr); end = int(seg["end"] * sr)
@@ -72,21 +73,21 @@ def build():
                 style = "[static interference]"
 
             clean_session_lines.append(seg["text"].strip())
-            annotated_text = f"{style} {seg['text'].strip()}".strip()
-            annotated_session_lines.append(f"{annotated_text}  (emotion={emotion}, rms={rms:.4f})")
-
+            annotated_session_lines.append(f"{style} {seg['text'].strip()}".strip())
+            
+            filename = os.path.splitext(os.path.basename(audio_path))[0] ### changed here
             all_segments.append({
-                "session": idx, "start": float(seg["start"]), "end": float(seg["end"]),
+                "session": filename, "start": float(seg["start"]), "end": float(seg["end"]),
                 "text": seg["text"].strip(), "emotion": emotion, "rms": float(rms), "pitch": float(pitch)
             })
 
-        # Write session transcripts
-        with open(os.path.join(OUTPUT_DIR, f"session_{idx}.txt"), "w", encoding="utf-8") as f:
-            f.write(f"Session {idx}\n\n")
+        filename = os.path.splitext(os.path.basename(audio_path))[0]  # e.g. "atlas_2025_1"
+        with open(os.path.join(OUTPUT_DIR, f"{filename}.txt"), "w", encoding="utf-8") as f:
+            f.write(f"{filename}\n\n")
             f.write(" ".join(clean_session_lines).strip() + "\n")
 
-        with open(os.path.join(OUTPUT_DIR, f"session_{idx}_annotated.txt"), "w", encoding="utf-8") as f:
-            f.write(f"Session {idx} (annotated)\n\n")
+        with open(os.path.join(OUTPUT_DIR, f"{filename}_annotated.txt"), "w", encoding="utf-8") as f:
+            f.write(f"{filename} (annotated)\n\n")
             for line in annotated_session_lines:
                 f.write(line + "\n")
 
