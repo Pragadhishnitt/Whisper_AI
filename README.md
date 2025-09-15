@@ -140,7 +140,7 @@ Select your operating system or preferred environment:
 
 ---
 
-## ☁️ **Google Colab (Recommended for 8GB RAM systems)**
+## ☁️ **Google Colab (Recommended for <=8GB RAM systems)**
 
 **⚠️ Important**: Enable GPU runtime in Colab for optimal performance.
 
