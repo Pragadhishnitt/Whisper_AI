@@ -21,120 +21,189 @@ It implements a **two-stage pipeline** that processes candidate audio files to:
 ## 📂 Project Structure
 
 ```
-truth_weaver_pipeline/
+Whisper_AI/
 │
-├── inputs/                  # Place your 5 audio files here (1.mp3 ... 5.mp3)
+├── inputs/                  # Place your 5 audio files here (__1.mp3 ... __5.mp3)
+│   └── audio.zip           # Compressed audio files for easy distribution
+├── final_outputs/           # Final results directory
+│   ├── truth.json          # Combined json (Competition submission file 2)
+│   └── transcript.txt      # Combined transcript (Competition submission file 1)
 ├── outputs/                 # Generated outputs (Stage 1 + Stage 2)
 │   ├── session_1.txt
 │   ├── session_1_annotated.txt
 │   ├── sessions.json
-│   ├── truth.json
 │   └── ...
 │
 ├── config.py                # Configuration (models, thresholds, file paths)
 ├── utils_audio.py           # Emotion classifier + feature extraction
 ├── stage_1.py
 ├── stage_2.py
-├── pipeline.sh          # Bash runner (Stage 1 → Stage 2)
+├── pipeline.sh              # Complete pipeline runner - Linux/Mac
+├── run_all.bat             # Complete pipeline runner - Windows
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## ⚙️ Setup
+## 🚀 Choose Your Platform
 
-1. **Clone / open this repo**
+Select your operating system or preferred environment:
+
+### [🪟 Windows Setup](#-windows)
+### [🐧 Ubuntu/Linux Setup](#-ubuntulinux)  
+### [☁️ Google Colab Setup](#️-google-colab-recommended-for-8gb-ram-systems)
+
+---
+
+## 🪟 **Windows**
+
+1. **Clone the repository**
+   ```cmd
+   git clone https://github.com/Pragadhishnitt/Whisper_AI
+   cd Whisper_AI
+   ```
+
+2. **Create virtual environment**
+   ```cmd
+   python -m venv .venv
+   .venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```cmd
+   pip install -r requirements.txt
+   ```
+
+4. **Install ffmpeg**
+   - Download from: https://ffmpeg.org/download.html
+   - Or use Chocolatey: `choco install ffmpeg`
+
+5. **Prepare audio files**
+   - Extract `audio.zip` 
+
+6. **Run complete pipeline**
+   ```cmd
+   run_all.bat
+   ```
+
+7. **Check results**
+   ```cmd
+   dir final_outputs
+   ```
+   - `truth.json` - Competition submission file
+   - `transcript.txt` - Combined transcript
+
+---
+
+## 🐧 **Ubuntu/Linux**
+
+1. **Clone the repository**
    ```bash
+   git clone https://github.com/Pragadhishnitt/Whisper_AI
    cd Whisper_AI
    ```
 
 2. **Create virtual environment**
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate        # Linux/Mac
-   .venv\Scripts\activate           # Windows
+   python3 -m venv .venv
+   source .venv/bin/activate
    ```
 
-3. **Install dependencies**
+3. **Install system dependencies**
+   ```bash
+   sudo apt update && sudo apt install ffmpeg
+   ```
+
+4. **Install Python dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Install ffmpeg (needed for Whisper)**
-   - Ubuntu/Debian:
-     ```bash
-     sudo apt update && sudo apt install ffmpeg
-     ```
-   - Mac (Homebrew):
-     ```bash
-     brew install ffmpeg
-     ```
-   - Windows (Chocolatey):
-     ```powershell
-     choco install ffmpeg
-     ```
-
-5. **Configure Gemini API Key**
-  *Can set it up in a .env file as well*
+5. **Prepare audio files**
    ```bash
-   export GOOGLE_API_KEY="YOUR_KEY"    # Linux/Mac
-   $env:GOOGLE_API_KEY="YOUR_KEY"      # Windows PowerShell
+   unzip audio.zip  # If using the provided zip file
    ```
-**Setting it as a .env file (method followed in this code)**
+
+6. **Run complete pipeline**
    ```bash
-      python3 create_env.py # Linux/Mac
-      python create_env.py # Windows
+   chmod +x pipeline.sh
+   ./pipeline.sh
    ```
----
 
-## 🎙️ Inputs
-
-- Place your 5 audio files in the `inputs/` folder:
-  ```
-  audio_inputs/1.mp3
-  audio_inputs/2.mp3
-  audio_inputs/3.mp3
-  audio_inputs/4.mp3
-  audio_inputs/5.mp3
-  ```
-
-- By default, **Session N = Audio File N**.
+7. **Check results**
+   ```bash
+   ls final_outputs/
+   ```
+   - `truth.json` - Competition submission file
+   - `transcript.txt` - Combined transcript
 
 ---
 
-## 🚀 Run the Pipeline
+## ☁️ **Google Colab (Recommended for 8GB RAM systems)**
 
-Use the provided bash script:
+**⚠️ Important**: Enable GPU runtime in Colab for optimal performance.
 
+<<<<<<< HEAD
 ```bash
 chmod +x pipeline.sh # inculde this line for Linux/Mac
 ./pipeline.sh
+=======
+#### Setup and Run
+
+```python
+# Enable GPU Runtime: Runtime → Change Runtime Type → Hardware Accelerator → GPU (T4)
+
+# Clone repository
+!git clone https://github.com/Pragadhishnitt/Whisper_AI
+%cd Whisper_AI
+
+# Install system dependencies
+!apt update && apt install -y ffmpeg
+
+# Install Python dependencies
+!pip install -r requirements.txt
+
+# Setup API key using Colab Secrets (🔑 icon in sidebar)
+# Key name: GOOGLE_API_KEY
+from google.colab import userdata
+import os
+os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
+
+# Extract audio files
+!cd inputs && unzip -o audio.zip
+
+# Run complete pipeline
+!chmod +x pipeline.sh
+!./pipeline.sh
+
+# Check results
+!ls final_outputs/
+
+# Download results
+from google.colab import files
+files.download('final_outputs/truth.json')
+files.download('final_outputs/transcript.txt')
+>>>>>>> 16f7d6c (Updated Readme)
 ```
-
-It will:
-
-1. Run **Stage 1** (`stage_1.py`) → generate transcripts & annotations.
-2. Run **Stage 2** (`stage_2.py`) → produce `truth.json`.
 
 ---
 
-## 📄 Outputs
+## 🎙️ Audio Input Requirements
 
-After running:
+- **Naming**: Files should be named `__1.mp3`, `__2.mp3`, `__3.mp3`, `__4.mp3`, `__5.mp3`
+- **Format**: MP3, WAV, M4A, or other common audio formats
 
-- `session_1.txt … session_5.txt`  
-  → Clean transcripts (for edit-distance evaluation).  
+---
 
-- `session_1_annotated.txt …`  
-  → Annotated transcripts (with `[tags]`, emotion, RMS).  
+## 📄 Results
 
-- `sessions.json`  
-  → Machine-readable version of all transcripts with segment-level metadata.  
+After successful execution, check the `final_outputs/` directory for:
 
-- `truth.json`  
-  → Final structured JSON in required schema (for competition submission). Example:
+- **`truth.json`** - Final competition submission file
+- **`transcript.txt`** - Combined transcript of all sessions
 
+### Sample `truth.json` Output:
 ```json
 {
   "shadow_id": "shadow_candidate_1",
@@ -159,18 +228,28 @@ After running:
 
 ## 🛠️ Configuration
 
-Check `config.py` to adjust:
-- `WHISPER_MODEL` → `"turbo"` (fast) or `"large-v3"` (most accurate).
-- `WHISPER_BACKEND` → `"openai-whisper"` (GitHub/PyPI whisper) or `"faster-whisper"`.
-- `SER_MODEL_ID` → HuggingFace emotion model (`superb/hubert-large-superb-er`).
-- `RMS_SHOUT`, `RMS_WHISPER`, `RMS_STATIC` → thresholds for style tagging.
+Modify `config.py` to adjust:
+- `WHISPER_MODEL` → `"turbo"` (fast) or `"large-v3"` (most accurate)
+- `WHISPER_BACKEND` → `"openai-whisper"` or `"faster-whisper"`
+- `SER_MODEL_ID` → HuggingFace emotion model
+- Audio thresholds → `RMS_SHOUT`, `RMS_WHISPER`, `RMS_STATIC`
 
 ---
 
-## 🔮 Future Plans
+## 🚨 Troubleshooting
 
-- Option to replace rule-based annotation with **LLM-based tagger**.  
-- Also looking out for Audio Language Models to replace OpenAI's whisper model
-- Batch pipeline runner with retries and JSON repair.  
-- Convert into an **agentic AI system** (monitoring inputs folder, auto-execution, feedback loop).  
+**Out of Memory (8GB RAM)** → Use Google Colab with GPU
 
+**Permission Denied (Linux/Mac)** → `chmod +x pipeline.sh`
+
+**FFmpeg Not Found** → Install ffmpeg for your platform
+
+**API Key Issues** → Ensure `GOOGLE_API_KEY` is properly set
+
+**Audio File Issues** → Check naming: `__1.mp3`, `__2.mp3`, etc.
+
+---
+
+## 🏆 Competition Submission
+
+The `truth.json` file in the `final_outputs/` directory is ready for competition submission.
