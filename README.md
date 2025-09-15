@@ -148,6 +148,7 @@ Select your operating system or preferred environment:
 ```bash
 chmod +x pipeline.sh # inculde this line for Linux/Mac
 ./pipeline.sh
+```
 
 #### Setup and Run
 
