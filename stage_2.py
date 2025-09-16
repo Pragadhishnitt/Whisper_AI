@@ -337,7 +337,7 @@ if __name__ == "__main__":
         if result:
             combined_results.append(result)
 
-    combined_path = os.path.join(FINAL_OUTPUT_DIR, "all_truths.json")
+    combined_path = os.path.join(FINAL_OUTPUT_DIR, "PrelimsSubmission.json")
     with open(combined_path, "w", encoding="utf-8") as f:
         json.dump(combined_results, f, ensure_ascii=False, indent=2)
 
