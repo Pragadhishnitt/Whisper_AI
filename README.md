@@ -26,7 +26,7 @@ Whisper_AI/
 ├── inputs/                  # Place your 5 audio files here (__1.mp3 ... __5.mp3)
 │   └── audio.zip           # Compressed audio files for easy distribution
 ├── final_outputs/           # Final results directory
-│   ├── truth.json          # Combined json (Competition submission file 2)
+│   ├── PrelimsSubmission.json          # Combined json (Competition submission file 2)
 │   └── transcript.txt      # Combined transcript (Competition submission file 1)
 ├── outputs/                 # Generated outputs (Stage 1 + Stage 2)
 │   ├── session_1.txt
@@ -91,7 +91,7 @@ Select your operating system or preferred environment:
    ```cmd
    dir final_outputs
    ```
-   - `truth.json` - Competition submission file
+   - `PrelimsSubmission.json` - Competition submission file
    - `transcript.txt` - Combined transcript
 
 ---
@@ -135,7 +135,7 @@ Select your operating system or preferred environment:
    ```bash
    ls final_outputs/
    ```
-   - `truth.json` - Competition submission file
+   - `PrelimsSubmission.json` - Competition submission file
    - `transcript.txt` - Combined transcript
 
 ---
@@ -183,7 +183,7 @@ os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
 
 # Download results
 from google.colab import files
-files.download('final_outputs/all_truths.json')
+files.download('final_outputs/PrelimsSubmission.json')
 files.download('final_outputs/transcript.txt')
 ```
 
@@ -200,7 +200,7 @@ files.download('final_outputs/transcript.txt')
 
 After successful execution, check the `final_outputs/` directory for:
 
-- **`truth.json`** - Final competition submission file
+- **`PrelimsSubmission.json`** - Final competition submission file
 - **`transcript.txt`** - Combined transcript of all sessions
 
 ### Sample `truth.json` Output:
