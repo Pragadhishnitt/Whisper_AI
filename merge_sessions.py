@@ -13,7 +13,7 @@ session_files = sorted(
 )
 
 # Output file path
-merged_file = os.path.join(OUTPUT_DIR, "transcript.txt")
+merged_file = os.path.join(FINAL_OUTPUT_DIR, "transcript.txt")
 
 with open(merged_file, "w", encoding="utf-8") as outfile:
     for file in session_files:
@@ -23,3 +23,4 @@ with open(merged_file, "w", encoding="utf-8") as outfile:
             outfile.write(f"{filename}:\n{text}\n\n")
 
 print(f"Merged {len(session_files)} session files into {merged_file}")
+
