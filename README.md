@@ -159,12 +159,6 @@ The pipeline is designed to be run from a single file, `main.py`, regardless of 
 # Install Python dependencies
 !pip install -r requirements.txt
 
-# Setup API key using Colab Secrets (🔑 icon in sidebar)
-# Key name: GOOGLE_API_KEY
-from google.colab import userdata
-import os
-os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
-
 # Extract audio files
 !cd inputs && unzip -o audio.zip
 
