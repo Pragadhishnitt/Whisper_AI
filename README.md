@@ -20,28 +20,29 @@ It implements a **two-stage pipeline** that processes candidate audio files to:
 
 ## 📂 Project Structure
 
+```
 Whisper_AI/
 │
-├── inputs/           # Place your 5 audio files here (__1.mp3 ... __5.mp3)
-│   └── audio.zip     # Compressed audio files for easy distribution
-├── final_outputs/        # Final results directory
-│   ├── PrelimsSubmission.json      # Combined json (Competition submission file 2)
-│   └── transcribed.txt       # Combined transcript (Competition submission file 1)
-├── outputs/              # Generated outputs (Stage 1 + Stage 2)
+├── inputs/                  # Place your 5 audio files here (__1.mp3 ... __5.mp3)
+│   └── audio.zip           # Compressed audio files for easy distribution
+├── final_outputs/           # Final results directory
+│   ├── truth.json          # Combined json (Competition submission file 2)
+│   └── transcript.txt      # Combined transcript (Competition submission file 1)
+├── outputs/                 # Generated outputs (Stage 1 + Stage 2)
 │   ├── session_1.txt
 │   ├── session_1_annotated.txt
 │   ├── sessions.json
 │   └── ...
 │
-├── config.py             # Configuration (models, thresholds, file paths)
-├── utils_audio.py        # Emotion classifier + feature extraction
+├── config.py                # Configuration (models, thresholds, file paths)
+├── utils_audio.py           # Emotion classifier + feature extraction
 ├── stage_1.py
 ├── stage_2.py
-├── pipeline.sh           # Complete pipeline runner - Linux/Mac
-├── run_all.bat           # Complete pipeline runner - Windows
+├── pipeline.sh              # Complete pipeline runner - Linux/Mac
+├── run_all.bat             # Complete pipeline runner - Windows
 ├── requirements.txt
-├── main.py               # Single entry point for all platforms
 └── README.md
+```
 
 
 ---
