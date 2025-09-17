@@ -17,9 +17,15 @@ merged_file = os.path.join(FINAL_OUTPUT_DIR, "transcript.txt")
 
 with open(merged_file, "w", encoding="utf-8") as outfile:
     for file in session_files:
-        filename = os.path.splitext(os.path.basename(file))[0]  # e.g. atlas_2025_1
+        filename = os.path.splitext(os.path.basename(file))[0]
         with open(file, "r", encoding="utf-8") as infile:
-            text = infile.read().strip()
+            lines = infile.read().strip().splitlines()
+            
+            # Drop the first line if it matches the filename
+            if lines and lines[0].strip() == filename:
+                lines = lines[1:]
+            
+            text = "\n".join(lines).strip()
             outfile.write(f"{filename}:\n{text}\n\n")
 
 print(f"Merged {len(session_files)} session files into {merged_file}")
