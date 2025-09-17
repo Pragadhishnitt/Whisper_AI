@@ -84,7 +84,7 @@ Select your operating system or preferred environment:
 
 6. **Run complete pipeline**
    ```cmd
-   run_all.bat
+   .\run_all.bat
    ```
 
 7. **Check results**
