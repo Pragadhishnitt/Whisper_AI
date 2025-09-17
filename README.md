@@ -1,6 +1,6 @@
 # Truth Weaver Pipeline
 
-This project is built for the **Eightfold AI Competition**. 
+This project is built for the **Eightfold AI Competition**.  
 It implements a **two-stage pipeline** that processes candidate audio files to:
 
 1. **Stage 1 – Transcription & Annotation**
@@ -26,8 +26,8 @@ Whisper_AI/
 ├── inputs/                  # Place your 5 audio files here (__1.mp3 ... __5.mp3)
 │   └── audio.zip           # Compressed audio files for easy distribution
 ├── final_outputs/           # Final results directory
-│   ├── truth.json          # Combined json (Competition submission file 2)
-│   └── transcript.txt      # Combined transcript (Competition submission file 1)
+│   ├── PrelimsSubmission.json  # Combined json (Competition submission file)
+│   └── transcribed.txt     # Combined transcript
 ├── outputs/                 # Generated outputs (Stage 1 + Stage 2)
 │   ├── session_1.txt
 │   ├── session_1_annotated.txt
@@ -36,111 +36,110 @@ Whisper_AI/
 │
 ├── config.py                # Configuration (models, thresholds, file paths)
 ├── utils_audio.py           # Emotion classifier + feature extraction
-├── stage_1.py
-├── stage_2.py
-├── pipeline.sh              # Complete pipeline runner - Linux/Mac
-├── run_all.bat             # Complete pipeline runner - Windows
+├── stage_1.py               # Stage 1 functions
+├── stage_2.py               # Stage 2 functions
+├── main.py                  # Single entry point - runs complete pipeline
 ├── requirements.txt
 └── README.md
 ```
 
-
 ---
 
-## 🚀 Get Started
+## 🚀 Choose Your Platform
 
-The pipeline is designed to be run from a single file, `main.py`, regardless of your operating system.
+Select your operating system or preferred environment:
 
 ### [🪟 Windows Setup](#-windows)
-### [🐧 Ubuntu/Linux Setup](#-ubuntulinux)
+### [🐧 Ubuntu/Linux Setup](#-ubuntulinux)  
 ### [☁️ Google Colab Setup](#️-google-colab-recommended-for-8gb-ram-systems)
 
 ---
 
 ## 🪟 **Windows**
 
-1.  **Clone the repository**
-    ```cmd
-    git clone [https://github.com/Pragadhishnitt/Whisper_AI](https://github.com/Pragadhishnitt/Whisper_AI)
-    cd Whisper_AI
-    ```
+1. **Clone the repository**
+   ```cmd
+   git clone https://github.com/Pragadhishnitt/Whisper_AI.git
+   cd Whisper_AI
+   ```
 
-2.  **Create virtual environment**
-    ```cmd
-    python -m venv .venv
-    .venv\Scripts\activate
-    ```
+2. **Create virtual environment**
+   ```cmd
+   python -m venv .venv
+   .venv\Scripts\activate
+   ```
 
-3.  **Install dependencies**
-    ```cmd
-    pip install -r requirements.txt
-    ```
+3. **Install dependencies**
+   ```cmd
+   pip install -r requirements.txt
+   ```
 
-4.  **Install ffmpeg**
-    -   Download from: https://ffmpeg.org/download.html
-    -   Or use Chocolatey: `choco install ffmpeg`
+4. **Install ffmpeg**
+   - Download from: https://ffmpeg.org/download.html
+   - Or use Chocolatey: `choco install ffmpeg`
 
-5.  **Prepare audio files**
-    -   Extract `audio.zip`
+5. **Prepare audio files**
+   - Extract `audio.zip` in the `inputs/` folder, or
+   - Place your audio files: `inputs/__1.mp3`, `inputs/__2.mp3`, `inputs/__3.mp3`, `inputs/__4.mp3`, `inputs/__5.mp3`
 
-6.  **Run complete pipeline**
-    ```cmd
-    python main.py
-    ```
+6. **Run complete pipeline**
+   ```cmd
+   python main.py
+   ```
 
-7.  **Check results**
-    ```cmd
-    dir final_outputs
-    ```
-    -   `PrelimsSubmission.json` - Competition submission file
-    -   `transcribed.txt` - Combined transcript
+7. **Check results**
+   ```cmd
+   dir final_outputs
+   ```
+   - `PrelimsSubmission.json` - Competition submission file
+   - `transcribed.txt` - Combined transcript
 
 ---
 
 ## 🐧 **Ubuntu/Linux**
 
-1.  **Clone the repository**
-    ```bash
-    git clone [https://github.com/Pragadhishnitt/Whisper_AI](https://github.com/Pragadhishnitt/Whisper_AI)
-    cd Whisper_AI
-    ```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Pragadhishnitt/Whisper_AI.git
+   cd Whisper_AI
+   ```
 
-2.  **Create virtual environment**
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    ```
+2. **Create virtual environment**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
 
-3.  **Install system dependencies**
-    ```bash
-    sudo apt update && sudo apt install ffmpeg
-    ```
+3. **Install system dependencies**
+   ```bash
+   sudo apt update && sudo apt install ffmpeg
+   ```
 
-4.  **Install Python dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
+4. **Install Python dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-5.  **Prepare audio files**
-    ```bash
-    unzip audio.zip  # If using the provided zip file
-    ```
+5. **Prepare audio files**
+   ```bash
+   unzip audio.zip -d inputs/  # If using the provided zip file
+   ```
 
-6.  **Run complete pipeline**
-    ```bash
-    python3 main.py
-    ```
+6. **Run complete pipeline**
+   ```bash
+   python3 main.py
+   ```
 
-7.  **Check results**
-    ```bash
-    ls final_outputs/
-    ```
-    -   `PrelimsSubmission.json` - Competition submission file
-    -   `transcribed.txt` - Combined transcript
+7. **Check results**
+   ```bash
+   ls final_outputs/
+   ```
+   - `PrelimsSubmission.json` - Competition submission file
+   - `transcribed.txt` - Combined transcript
 
 ---
 
-## ☁️ **Google Colab (Recommended for <=8GB RAM systems)**
+## ☁️ **Google Colab (Recommended for ≤8GB RAM systems)**
 
 **⚠️ Important**: Enable GPU runtime in Colab for optimal performance.
 
@@ -150,7 +149,7 @@ The pipeline is designed to be run from a single file, `main.py`, regardless of 
 # Enable GPU Runtime: Runtime → Change Runtime Type → Hardware Accelerator → GPU (T4)
 
 # Clone repository
-!git clone [https://github.com/Pragadhishnitt/Whisper_AI](https://github.com/Pragadhishnitt/Whisper_AI)
+!git clone https://github.com/Pragadhishnitt/Whisper_AI.git
 %cd Whisper_AI
 
 # Install system dependencies
@@ -159,8 +158,14 @@ The pipeline is designed to be run from a single file, `main.py`, regardless of 
 # Install Python dependencies
 !pip install -r requirements.txt
 
+# Setup API key using Colab Secrets (🔑 icon in sidebar)
+# Key name: GOOGLE_API_KEY
+from google.colab import userdata
+import os
+os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
+
 # Extract audio files
-!cd inputs && unzip -o audio.zip
+!unzip audio.zip -d inputs/
 
 # Run complete pipeline
 !python3 main.py
@@ -172,27 +177,27 @@ The pipeline is designed to be run from a single file, `main.py`, regardless of 
 from google.colab import files
 files.download('final_outputs/PrelimsSubmission.json')
 files.download('final_outputs/transcribed.txt')
-
 ```
 
-🎙️ Audio Input Requirements
+---
 
-    Naming: Files should be named __1.mp3, __2.mp3, __3.mp3, __4.mp3, __5.mp3
+## 🎙️ Audio Input Requirements
 
-    Format: MP3, WAV, M4A, or other common audio formats
+- **Naming**: Files should be named `__1.mp3`, `__2.mp3`, `__3.mp3`, `__4.mp3`, `__5.mp3`
+- **Format**: MP3, WAV, M4A, or other common audio formats
+- **Quality**: Clear speech, minimal background noise preferred
 
-📄 Results
+---
 
-After successful execution, check the final_outputs/ directory for:
+## 📄 Results
 
-    PrelimsSubmission.json - Final competition submission file
+After successful execution, check the `final_outputs/` directory for:
 
-    transcribed.txt - Combined transcript of all sessions
+- **`PrelimsSubmission.json`** - Final competition submission file
+- **`transcribed.txt`** - Combined transcript of all sessions
 
-Sample PrelimsSubmission.json Output:
-
-JSON
-
+### Sample `PrelimsSubmission.json` Output:
+```json
 {
   "shadow_id": "shadow_candidate_1",
   "revealed_truth": {
@@ -210,29 +215,34 @@ JSON
     }
   ]
 }
+```
 
-🛠️ Configuration
+---
 
-Modify config.py to adjust:
+## 🛠️ Configuration
 
-    WHISPER_MODEL → "turbo" (fast) or "large-v3" (most accurate)
+Modify `config.py` to adjust:
+- `WHISPER_MODEL` → `"turbo"` (fast) or `"large-v3"` (most accurate)
+- `WHISPER_BACKEND` → `"openai-whisper"` or `"faster-whisper"`
+- `SER_MODEL_ID` → HuggingFace emotion model
+- Audio thresholds → `RMS_SHOUT`, `RMS_WHISPER`, `RMS_STATIC`
 
-    WHISPER_BACKEND → "openai-whisper" or "faster-whisper"
+---
 
-    SER_MODEL_ID → HuggingFace emotion model
+## 🚨 Troubleshooting
 
-    Audio thresholds → RMS_SHOUT, RMS_WHISPER, RMS_STATIC
+**Out of Memory (≤8GB RAM)** → Use Google Colab with GPU
 
-🚨 Troubleshooting
+**FFmpeg Not Found** → Install ffmpeg for your platform
 
-Out of Memory (8GB RAM) → Use Google Colab with GPU
+**API Key Issues** → Set up `GOOGLE_API_KEY` environment variable or use Colab Secrets
 
-FFmpeg Not Found → Install ffmpeg for your platform
+**Audio File Issues** → Check naming: `__1.mp3`, `__2.mp3`, etc.
 
-API Key Issues → Ensure GOOGLE_API_KEY is properly set
+**Import Errors** → Ensure all dependencies are installed: `pip install -r requirements.txt`
 
-Audio File Issues → Check naming: __1.mp3, __2.mp3, etc.
+---
 
-🏆 Competition Submission
+## 🏆 Competition Submission
 
-The PrelimsSubmission.json file in the final_outputs/ directory is ready for competition submission.
+The `transcribed.txt` and `PrelimsSubmission.json` files in the `final_outputs/` directory is ready for competition submission.
