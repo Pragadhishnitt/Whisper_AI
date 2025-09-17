@@ -252,4 +252,4 @@ Modify `config.py` to adjust:
 
 ## 🏆 Competition Submission
 
-The `truth.json` file in the `final_outputs/` directory is ready for competition submission.
+The `PrelimsSubmission.json` file in the `final_outputs/` directory is ready for competition submission.
