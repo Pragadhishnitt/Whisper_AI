@@ -245,4 +245,6 @@ Modify `config.py` to adjust:
 
 ## 🏆 Competition Submission
 
+
 The `transcribed.txt` and `PrelimsSubmission.json` files in the `final_outputs/` directory is ready for competition submission.
+
