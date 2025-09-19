@@ -13,7 +13,7 @@ session_files = sorted(
 )
 
 # Output file path
-merged_file = os.path.join(FINAL_OUTPUT_DIR, "transcript.txt")
+merged_file = os.path.join(FINAL_OUTPUT_DIR, "transcribed.txt")
 
 with open(merged_file, "w", encoding="utf-8") as outfile:
     for file in session_files:

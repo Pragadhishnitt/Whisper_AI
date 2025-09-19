@@ -14,7 +14,7 @@ It implements a **two-stage pipeline** that processes candidate audio files to:
    - Feed the transcripts + annotations into **Gemini** (via LangChain + LangGraph).
    - Detect contradictions and infer the most plausible truth.
    - Validate output against a **Pydantic schema**.
-   - Generate a **competition-ready JSON** (`truth.json`).
+   - Generate a **competition-ready JSON** (`PrelimsSubmission.json`).
 
 ---
 
@@ -26,8 +26,8 @@ Whisper_AI/
 ├── inputs/                  # Place your 5 audio files here (__1.mp3 ... __5.mp3)
 │   └── audio.zip           # Compressed audio files for easy distribution
 ├── final_outputs/           # Final results directory
-│   ├── PrelimsSubmission.json          # Combined json (Competition submission file 2)
-│   └── transcript.txt      # Combined transcript (Competition submission file 1)
+│   ├── PrelimsSubmission.json  # Combined json (Competition submission file)
+│   └── transcribed.txt     # Combined transcript
 ├── outputs/                 # Generated outputs (Stage 1 + Stage 2)
 │   ├── session_1.txt
 │   ├── session_1_annotated.txt
@@ -36,10 +36,9 @@ Whisper_AI/
 │
 ├── config.py                # Configuration (models, thresholds, file paths)
 ├── utils_audio.py           # Emotion classifier + feature extraction
-├── stage_1.py
-├── stage_2.py
-├── pipeline.sh              # Complete pipeline runner - Linux/Mac
-├── run_all.bat             # Complete pipeline runner - Windows
+├── stage_1.py               # Stage 1 functions
+├── stage_2.py               # Stage 2 functions
+├── main.py                  # Single entry point - runs complete pipeline
 ├── requirements.txt
 └── README.md
 ```
@@ -60,7 +59,7 @@ Select your operating system or preferred environment:
 
 1. **Clone the repository**
    ```cmd
-   git clone https://github.com/Pragadhishnitt/Whisper_AI
+   git clone https://github.com/Pragadhishnitt/Whisper_AI.git
    cd Whisper_AI
    ```
 
@@ -80,11 +79,12 @@ Select your operating system or preferred environment:
    - Or use Chocolatey: `choco install ffmpeg`
 
 5. **Prepare audio files**
-   - Extract `audio.zip` 
+   - Extract `audio.zip` in the `inputs/` folder, or
+   - Place your audio files: `inputs/__1.mp3`, `inputs/__2.mp3`, `inputs/__3.mp3`, `inputs/__4.mp3`, `inputs/__5.mp3`
 
 6. **Run complete pipeline**
    ```cmd
-   .\run_all.bat
+   python main.py
    ```
 
 7. **Check results**
@@ -92,7 +92,7 @@ Select your operating system or preferred environment:
    dir final_outputs
    ```
    - `PrelimsSubmission.json` - Competition submission file
-   - `transcript.txt` - Combined transcript
+   - `transcribed.txt` - Combined transcript
 
 ---
 
@@ -100,7 +100,7 @@ Select your operating system or preferred environment:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Pragadhishnitt/Whisper_AI
+   git clone https://github.com/Pragadhishnitt/Whisper_AI.git
    cd Whisper_AI
    ```
 
@@ -122,13 +122,12 @@ Select your operating system or preferred environment:
 
 5. **Prepare audio files**
    ```bash
-   unzip audio.zip  # If using the provided zip file
+   unzip audio.zip -d inputs/  # If using the provided zip file
    ```
 
 6. **Run complete pipeline**
    ```bash
-   chmod +x pipeline.sh
-   ./pipeline.sh
+   python3 main.py
    ```
 
 7. **Check results**
@@ -136,19 +135,13 @@ Select your operating system or preferred environment:
    ls final_outputs/
    ```
    - `PrelimsSubmission.json` - Competition submission file
-   - `transcript.txt` - Combined transcript
+   - `transcribed.txt` - Combined transcript
 
 ---
 
-## ☁️ **Google Colab (Recommended for <=8GB RAM systems)**
+## ☁️ **Google Colab (Recommended for ≤8GB RAM systems)**
 
 **⚠️ Important**: Enable GPU runtime in Colab for optimal performance.
-
-
-```bash
-chmod +x pipeline.sh # inculde this line for Linux/Mac
-./pipeline.sh
-```
 
 #### Setup and Run
 
@@ -156,7 +149,7 @@ chmod +x pipeline.sh # inculde this line for Linux/Mac
 # Enable GPU Runtime: Runtime → Change Runtime Type → Hardware Accelerator → GPU (T4)
 
 # Clone repository
-!git clone https://github.com/Pragadhishnitt/Whisper_AI
+!git clone https://github.com/Pragadhishnitt/Whisper_AI.git
 %cd Whisper_AI
 
 # Install system dependencies
@@ -172,11 +165,10 @@ import os
 os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
 
 # Extract audio files
-!cd inputs && unzip -o audio.zip
+!unzip audio.zip -d inputs/
 
 # Run complete pipeline
-!chmod +x pipeline.sh
-!./pipeline.sh
+!python3 main.py
 
 # Check results
 !ls final_outputs/
@@ -184,7 +176,7 @@ os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
 # Download results
 from google.colab import files
 files.download('final_outputs/PrelimsSubmission.json')
-files.download('final_outputs/transcript.txt')
+files.download('final_outputs/transcribed.txt')
 ```
 
 ---
@@ -193,6 +185,7 @@ files.download('final_outputs/transcript.txt')
 
 - **Naming**: Files should be named `__1.mp3`, `__2.mp3`, `__3.mp3`, `__4.mp3`, `__5.mp3`
 - **Format**: MP3, WAV, M4A, or other common audio formats
+- **Quality**: Clear speech, minimal background noise preferred
 
 ---
 
@@ -201,9 +194,9 @@ files.download('final_outputs/transcript.txt')
 After successful execution, check the `final_outputs/` directory for:
 
 - **`PrelimsSubmission.json`** - Final competition submission file
-- **`transcript.txt`** - Combined transcript of all sessions
+- **`transcribed.txt`** - Combined transcript of all sessions
 
-### Sample `truth.json` Output:
+### Sample `PrelimsSubmission.json` Output:
 ```json
 {
   "shadow_id": "shadow_candidate_1",
@@ -238,18 +231,20 @@ Modify `config.py` to adjust:
 
 ## 🚨 Troubleshooting
 
-**Out of Memory (8GB RAM)** → Use Google Colab with GPU
-
-**Permission Denied (Linux/Mac)** → `chmod +x pipeline.sh`
+**Out of Memory (≤8GB RAM)** → Use Google Colab with GPU
 
 **FFmpeg Not Found** → Install ffmpeg for your platform
 
-**API Key Issues** → Ensure `GOOGLE_API_KEY` is properly set
+**API Key Issues** → Set up `GOOGLE_API_KEY` environment variable or use Colab Secrets
 
 **Audio File Issues** → Check naming: `__1.mp3`, `__2.mp3`, etc.
+
+**Import Errors** → Ensure all dependencies are installed: `pip install -r requirements.txt`
 
 ---
 
 ## 🏆 Competition Submission
 
-The `PrelimsSubmission.json` file in the `final_outputs/` directory is ready for competition submission.
+
+The `transcribed.txt` and `PrelimsSubmission.json` files in the `final_outputs/` directory is ready for competition submission.
+
