@@ -21,7 +21,7 @@ OUTPUT_DIR = "outputs"
 FINAL_OUTPUT_DIR = "final_outputs"
 TRUTH_JSON_OUTPUT = "truth_json_output"
 SER_MODEL_ID = "superb/hubert-large-superb-er"
-TEMP_DIRECTORIES = ["atlas", "oceanus", "rhea", "selene", "titan", "hyperion", "eos"]
+TEMP_DIRECTORIES = ["atlas", "oceanus", "rhea", "selene", "titan", "hyperion", "eos","crius"]
 
 # Heuristic thresholds
 RMS_WHISPER = 0.5
